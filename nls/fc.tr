@@ -1,42 +1,42 @@
 #### Help        ####
-1.0:˜ki dosya ya da dosyalarn b”lmlerini karŸlaŸtrr ve onlarn arasnda olan farkllklar g”rntler
-1.1:FC [se‡enekler] [drive1:][path1]dosya_ismi1 [drive2][path2]dosya_ismi2 [se‡enekler]
-1.2: /A    Her de§iŸikliklerin b”lmleri i‡in yalnzca ilk ile son satrlarn g”rntler
-1.3: /B    Bir ikili karŸlaŸtrma yapar
-1.4: /C    Byk-k‡k harf ayrmna ”nem vermez
-1.5: /L    Dosyalar ASCII metin olarak karŸlaŸtrr
-1.6: /Mn   En ‡ok ikili karŸlaŸtrmada olan farklar n bayt kadar belirtir
-1.7:       (varsaylan = %d, 0 = snr yok, /M = /M0)
-1.8: /N    Bir metin karŸlaŸtrmasnda satr numaralarn g”rntler
-1.9: /S    Aramay alt dizinlerde olan dosyalarda geniŸletir
-1.10: /T    Sekmeleri boŸluklara geniŸletmez
-1.11: /W    Metin karŸlaŸtrma i‡in boŸ alanlar (sekmeler ile boŸluklar) sarar
-1.12: /X    Metin karŸlaŸtrmada ba§lam satrlarn g”rntlemez
-1.13: /LBn  En ‡ok ardŸk farkl ASCII satrlarn n says kadar belirtir
-1.14: /nnn  KarŸlaŸtrma eŸzamanlamas i‡in en az ardŸk eŸleŸen satrlar
-1.15:       nnn says kadar belirtir
-1.16: /R    Son bir ksa bilgi g”rntler (her zaman /S kullanlrsa etkin olur)
-1.17: /Q    Farkllklarn listesini g”rntlemez
-1.18: /U    Dosya isimlerini dosyalarn bir eŸi olmadan g”rntler
+1.0:Ä°ki dosya ya da dosyalarÄ±n bÃ¶lÃ¼mlerini karÅŸÄ±laÅŸtÄ±rÄ±r ve onlarÄ±n arasÄ±nda olan farklÄ±lÄ±klarÄ± gÃ¶rÃ¼ntÃ¼ler
+1.1:FC [seÃ§enekler] [drive1:][path1]dosya_ismi1 [drive2][path2]dosya_ismi2 [seÃ§enekler]
+1.2: /A    Her deÄŸiÅŸikliklerin bÃ¶lÃ¼mleri iÃ§in yalnÄ±zca ilk ile son satÄ±rlarÄ±nÄ± gÃ¶rÃ¼ntÃ¼ler
+1.3: /B    Bir ikili karÅŸÄ±laÅŸtÄ±rma yapar
+1.4: /C    BÃ¼yÃ¼k-kÃ¼Ã§Ã¼k harf ayrÄ±mÄ±na Ã¶nem vermez
+1.5: /L    DosyalarÄ± ASCII metin olarak karÅŸÄ±laÅŸtÄ±rÄ±r
+1.6: /Mn   En Ã§ok ikili karÅŸÄ±laÅŸtÄ±rmada olan farklarÄ± n bayt kadar belirtir
+1.7:       (varsayÄ±lan = %d, 0 = sÄ±nÄ±r yok, /M = /M0)
+1.8: /N    Bir metin karÅŸÄ±laÅŸtÄ±rmasÄ±nda satÄ±r numaralarÄ±nÄ± gÃ¶rÃ¼ntÃ¼ler
+1.9: /S    AramayÄ± alt dizinlerde olan dosyalarda geniÅŸletir
+1.10: /T    Sekmeleri boÅŸluklara geniÅŸletmez
+1.11: /W    Metin karÅŸÄ±laÅŸtÄ±rma iÃ§in boÅŸ alanlarÄ± (sekmeler ile boÅŸluklar) sarar
+1.12: /X    Metin karÅŸÄ±laÅŸtÄ±rmada baÄŸlam satÄ±rlarÄ±nÄ± gÃ¶rÃ¼ntÃ¼lemez
+1.13: /LBn  En Ã§ok ardÄ±ÅŸÄ±k farklÄ± ASCII satÄ±rlarÄ±nÄ± n sayÄ±sÄ± kadar belirtir
+1.14: /nnn  KarÅŸÄ±laÅŸtÄ±rma eÅŸzamanlamasÄ± iÃ§in en az ardÄ±ÅŸÄ±k eÅŸleÅŸen satÄ±rlarÄ±
+1.15:       nnn sayÄ±sÄ± kadar belirtir
+1.16: /R    Son bir kÄ±sa bilgi gÃ¶rÃ¼ntÃ¼ler (her zaman /S kullanÄ±lÄ±rsa etkin olur)
+1.17: /Q    FarklÄ±lÄ±klarÄ±n listesini gÃ¶rÃ¼ntÃ¼lemez
+1.18: /U    Dosya isimlerini dosyalarÄ±n bir eÅŸi olmadan gÃ¶rÃ¼ntÃ¼ler
 #### Messages    ####
-2.0:Ge‡ersiz se‡enek: %s
-2.1:€ok fazla dosya belirtimi
-2.2:Ge‡ersiz dosya ismi
-2.3:Hi‡ dosya belirtilmedi
-2.4:Uyar: dosyalar farkl boyutlarda!
-2.5:%d hatadan sonra karŸlaŸtrma durdu
-2.6:Farkllk yok
-2.7:Uyar: %d satr sonra karŸlaŸtrma kesildi
+2.0:GeÃ§ersiz seÃ§enek: %s
+2.1:Ã‡ok fazla dosya belirtimi
+2.2:GeÃ§ersiz dosya ismi
+2.3:HiÃ§ dosya belirtilmedi
+2.4:UyarÄ±: dosyalar farklÄ± boyutlarda!
+2.5:%d hatadan sonra karÅŸÄ±laÅŸtÄ±rma durdu
+2.6:FarklÄ±lÄ±k yok
+2.7:UyarÄ±: %d satÄ±r sonra karÅŸÄ±laÅŸtÄ±rma kesildi
 2.8:Yetersiz bellek
-2.9:%s dosyas a‡lmasnda hata
-2.10:%s ile %s karŸlaŸtrlmas
-2.11:Dosya ya da dizin de§il
-2.12:Yeniden eŸ zamanlama baŸarsz oldu: dosyalar ‡ok farkl
-2.13:Dosyalar farkl boyutlarda
-2.14:Dosyalar farkl
-2.15:%s dosyas (%s) eŸine sahip de§il
+2.9:%s dosyasÄ± aÃ§Ä±lmasÄ±nda hata
+2.10:%s ile %s karÅŸÄ±laÅŸtÄ±rÄ±lmasÄ±
+2.11:Dosya ya da dizin deÄŸil
+2.12:Yeniden eÅŸ zamanlama baÅŸarÄ±sÄ±z oldu: dosyalar Ã§ok farklÄ±
+2.13:Dosyalar farklÄ± boyutlarda
+2.14:Dosyalar farklÄ±
+2.15:%s dosyasÄ± (%s) eÅŸine sahip deÄŸil
 #### Report text ####
-3.0:%d dosyalar karŸlaŸtrld
+3.0:%d dosyalarÄ± karÅŸÄ±laÅŸtÄ±rÄ±ldÄ±
 3.1: %d dizinlerinde
-3.2:%d dosyalar karŸlaŸtrlmas, %d dosyalar farkl
-3.3:%d dosyalar hi‡ eŸe sahip de§il
+3.2:%d dosyalarÄ± karÅŸÄ±laÅŸtÄ±rÄ±lmasÄ±, %d dosyalarÄ± farklÄ±
+3.3:%d dosyalarÄ± hiÃ§ eÅŸe sahip deÄŸil
