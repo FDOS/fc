@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <sys\stat.h>
-#include "FCTools.h"
+#include <sys/stat.h>
+
+#include "fctools.h"
 
 #define CARRY	1	/* Carry flag */
 #define DOS	0x21	/* DOS interrupt */

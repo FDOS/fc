@@ -37,10 +37,8 @@ Version 3.03: Bug fix: /M was not allowed
 	      Added a switch termination check
 *************************************************************************** */
 
-#define USE_KITTEN	/* Define this to use kitten */
-
 #if !defined(__LARGE__)
-  #error Must be compiled with the LARGE model.
+# error Must be compiled with the LARGE model.
 #endif
 
 #include <stdio.h>
@@ -48,11 +46,12 @@ Version 3.03: Bug fix: /M was not allowed
 #include <string.h>
 #include <ctype.h>
 #include <io.h>
-#include <sys\stat.h>
-#ifdef USE_KITTEN
-  #include "Kitten.h"
-#endif
-#include "FCTools.h"
+#include <sys/stat.h>
+
+#include "../kitten/kitten.h"
+
+#include "fctools.h"
+
 /* ------------------------------------------------------------------------ */
 #define MAX_LINES			32765
 #define DEFAULT_LINES_FOR_RESYNC	2
@@ -121,12 +120,9 @@ const char NoCorrespondent[] = "File %s has no correspondent (%s)";
 #define HELP		1
 #define MESSAGE		2
 #define REPORT_TEXT	3
-/* ------------------------------------------------------------------------ */
-#ifdef USE_KITTEN
-  #define Format(setnum, msgnum, message) kittengets(setnum, msgnum, message)
-#else
-  #define Format(dummy1, dummy2, message)  message
-#endif
+nl_catd cat;					/* language catalog         */
+#define Format(setnum, msgnum, message) catgets(cat, setnum, msgnum, message)
+
 /* ************************************************************************ */
 void HelpMessage(void)
 {
@@ -1125,16 +1121,13 @@ void OnExit(void)
 {
   /* If created destroy the CRC speed-up table */
   if (CRCTable != NULL) free(CRCTable);
-#ifdef USE_KITTEN
-  kittenclose();	/* Close the NLS catalog */
-#endif
+
+  catclose(cat);	/* Close the NLS catalog */
 }
 /* ------------------------------------------------------------------------ */
 int main(void)
 {
-#ifdef USE_KITTEN
-  kittenopen("FC");     /* Try opening NLS catalog */
-#endif
+  cat = catopen("fc", 0);	/* Try opening NLS catalog */
   atexit (OnExit);	/* Install the clean-up procedure */
   UpCaseInit();		/* Initialize the table for uppercase conversion */
 
