@@ -187,7 +187,17 @@ char* FullPath(char* Buffer, char *Path, int BufferSize)
     r.x.cflag = CARRY;		/* Set carry to prepare for failure */
     intdosx(&r, &r, &s);
     if (r.x.cflag == CARRY)	/* Carry -> Not ok */
-      getcurdir(Drive, WorkPointer);	/* Use the SFN function */
+    {
+      r.x.ax = 0x4700;		/* Get current directory (SFN) */
+      r.x.dx = Drive;
+      s.ds = FP_SEG(WorkPointer); r.x.si = FP_OFF(WorkPointer);
+      r.x.cflag = CARRY;	/* Set carry to prepare for failure */
+      intdosx(&r, &r, &s);
+      if (r.x.cflag == CARRY)	/* Carry -> Not ok */
+      {
+        /* We should complain but this library is quiet (only failure is invalid drive */
+      }
+    }
 
     if (*WorkPointer != END_OF_STRING)
     {
