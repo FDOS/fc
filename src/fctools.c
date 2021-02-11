@@ -220,7 +220,7 @@ char* FullPath(char* Buffer, char *Path, int BufferSize)
     switch (WorkPointer[1])
     {
       case '\\':                        /* ".\" */
-	stpcpy(WorkPointer, WorkPointer + 2);
+	strcpy(WorkPointer, WorkPointer + 2);
 	break;
 
       case END_OF_STRING:		/* Terminal '.' */
@@ -256,7 +256,7 @@ char* FullPath(char* Buffer, char *Path, int BufferSize)
 	      } while (*WorkPointer != '\\');
 	      Work--;
 	    } while (Work > 0);
-	    stpcpy(WorkPointer, Path);
+	    strcpy(WorkPointer, Path);
 	  }
 	}
 	break;
