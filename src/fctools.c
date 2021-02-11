@@ -164,7 +164,11 @@ char* FullPath(char* Buffer, char *Path, int BufferSize)
     Path += 2;
   }
   else					 /* Default drive */
-    Drive = WorkPointer[0] = getdisk() + 'A';
+  {
+    unsigned drv;
+    _dos_getdrive(&drv);
+    Drive = WorkPointer[0] = 'A' + drv - 1;
+  }
   WorkPointer[1] = ':';
   WorkPointer += 2; BufferSize -= 2;
 
