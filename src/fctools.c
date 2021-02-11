@@ -7,8 +7,11 @@
 
 #include "fctools.h"
 
+#if defined(__WATCOMC__)
+#include <i86.h>
+#endif
+
 #define CARRY	1	/* Carry flag */
-#define DOS	0x21	/* DOS interrupt */
 
 #define LFN_NOT_SUPPORTED	0x7100
 
@@ -37,21 +40,23 @@ typedef struct		/* Windows95 long filename find record */
 
 int FindFirst(const char* PathName, find_data* FindData, int Attrib)
 {
-  struct REGPACK r;
+  union REGS r;
+  struct SREGS s;
+
   lfn_find_results FindResults;
 
   FindData->Filename[0] = END_OF_STRING;
   FindData->UseLFN = TRUE;
-  r.r_ax = 0x714E;		/* Find first matching file */
-  r.r_cx = Attrib;
-  r.r_si = 1;			/* MS-DOS style time */
-  r.r_ds = FP_SEG(PathName);	 r.r_dx = FP_OFF(PathName);
-  r.r_es = FP_SEG(&FindResults); r.r_di = FP_OFF(&FindResults);
-  r.r_flags = CARRY;		/* Set carry to prepare for failure */
-  intr(DOS, &r);
-  if ((r.r_flags & CARRY) == 0) /* No carry -> Ok */
+  r.x.ax = 0x714E;		/* Find first matching file */
+  r.x.cx = Attrib;
+  r.x.si = 1;			/* MS-DOS style time */
+  s.ds = FP_SEG(PathName);	r.x.dx = FP_OFF(PathName);
+  s.es = FP_SEG(&FindResults);	r.x.di = FP_OFF(&FindResults);
+  r.x.cflag = CARRY;		/* Set carry to prepare for failure */
+  intdosx(&r, &r, &s);
+  if (r.x.cflag != CARRY)	/* No carry -> Ok */
   {
-    FindData->Handle = r.r_ax;
+    FindData->Handle = r.x.ax;
     errno = 0;
     if (FindResults.LongFilename != END_OF_STRING)
       strncpy(FindData->Filename, FindResults.LongFilename,
@@ -63,7 +68,7 @@ int FindFirst(const char* PathName, find_data* FindData, int Attrib)
   }
   else
   {
-    if (r.r_ax == LFN_NOT_SUPPORTED) /* Function not supported */
+    if (r.x.ax == LFN_NOT_SUPPORTED) /* Function not supported */
     {
       FindData->UseLFN = FALSE; /* Use the standard functions */
       errno = findfirst(PathName, &(FindData->SearchRec), Attrib);
@@ -75,7 +80,7 @@ int FindFirst(const char* PathName, find_data* FindData, int Attrib)
       }
     }
     else			/* A true error */
-      errno = r.r_ax;		/* DOS error code */
+      errno = r.x.ax;		/* DOS error code */
   }
   return errno;
 }
@@ -85,16 +90,17 @@ int FindNext(find_data* FindData)
   FindData->Filename[0] = END_OF_STRING;
   if (FindData->UseLFN)
   {
-    struct REGPACK r;
+    union REGS r;
+    struct SREGS s;
     lfn_find_results FindResults;
 
-    r.r_ax = 0x714F;		  /* Find next matching file */
-    r.r_bx = FindData->Handle;
-    r.r_si = 1;			  /* MS-DOS style time */
-    r.r_es = FP_SEG(&FindResults); r.r_di = FP_OFF(&FindResults);
-    r.r_flags = CARRY;		  /* Set carry to prepare for failure */
-    intr(DOS, &r);
-    if ((r.r_flags & CARRY) == 0) /* No carry -> Ok */
+    r.x.ax = 0x714F;		/* Find next matching file */
+    r.x.bx = FindData->Handle;
+    r.x.si = 1;			/* MS-DOS style time */
+    s.es = FP_SEG(&FindResults); r.x.di = FP_OFF(&FindResults);
+    r.x.cflag = CARRY;		/* Set carry to prepare for failure */
+    intdosx(&r, &r, &s);
+    if (r.x.cflag != CARRY)	/* No carry -> Ok */
     {
       errno = 0;
       if (FindResults.LongFilename != END_OF_STRING)
@@ -106,7 +112,7 @@ int FindNext(find_data* FindData)
       FindData->Attributes = FindResults.Attributes & 0xFF;
     }
     else
-      errno = r.r_ax;		  /* DOS error code */
+      errno = r.x.ax;		  /* DOS error code */
 
   }
   else
@@ -126,13 +132,15 @@ int FindClose(find_data* FindData)
 {
   if (FindData->UseLFN)
   {
-    struct REGPACK r;
+    union REGS r;
+    struct SREGS s;
 
-    r.r_ax = 0x71A1;		  /* Terminate directory search */
-    r.r_bx = FindData->Handle;
-    intr(DOS, &r);
+    r.x.ax = 0x71A1;		/* Terminate directory search */
+    r.x.bx = FindData->Handle;
+    intdosx(&r, &r, &s);
     errno = 0;
-    if ((r.r_flags & CARRY) != 0) errno = r.r_ax; /* DOS error code */
+    if (r.x.cflag == CARRY)
+      errno = r.x.ax;		/* DOS error code */
     return errno;
   }
   return 0;
@@ -141,7 +149,8 @@ int FindClose(find_data* FindData)
 /* ************************************************************************ */
 char* FullPath(char* Buffer, char *Path, int BufferSize)
 {
-  struct REGPACK r;
+  union REGS r;
+  struct SREGS s;
   char Drive;
   int Work;
   char* WorkPointer = Buffer;
@@ -168,12 +177,12 @@ char* FullPath(char* Buffer, char *Path, int BufferSize)
     Path++;			/* Absolute path */
   else
   {				/* Relative path */
-    r.r_ax = 0x7147;		/* Get current directory (LFN) */
-    r.r_dx = Drive;
-    r.r_ds = FP_SEG(WorkPointer);  r.r_si = FP_OFF(WorkPointer);
-    r.r_flags = CARRY;	/* Set carry to prepare for failure */
-    intr(DOS, &r);
-    if ((r.r_flags & CARRY) != 0)	/* Carry -> Not ok */
+    r.x.ax = 0x7147;		/* Get current directory (LFN) */
+    r.x.dx = Drive;
+    s.ds = FP_SEG(WorkPointer);	r.x.si = FP_OFF(WorkPointer);
+    r.x.cflag = CARRY;		/* Set carry to prepare for failure */
+    intdosx(&r, &r, &s);
+    if (r.x.cflag == CARRY)	/* Carry -> Not ok */
       getcurdir(Drive, WorkPointer);	/* Use the SFN function */
 
     if (*WorkPointer != END_OF_STRING)
@@ -252,16 +261,17 @@ char* FullPath(char* Buffer, char *Path, int BufferSize)
 /* ------------------------------------------------------------------------ */
 FILE* FileOpen(const char* Filename, const char* Mode)
 {
-  struct REGPACK r;
+  union REGS r;
+  struct SREGS s;
   char ShortFilename[128];
 
-  r.r_ax = 0x7160;		/* Get short filename */
-  r.r_cx = 0X8001;
-  r.r_ds = FP_SEG(Filename);	  r.r_si = FP_OFF(Filename);
-  r.r_es = FP_SEG(ShortFilename); r.r_di = FP_OFF(ShortFilename);
-  r.r_flags = CARRY;		/* Set carry to prepare for failure */
-  intr(DOS, &r);
-  if ((r.r_flags & CARRY) == 0) /* No carry -> Ok */
+  r.x.ax = 0x7160;		/* Get short filename */
+  r.x.cx = 0X8001;
+  s.ds = FP_SEG(Filename);	r.x.si = FP_OFF(Filename);
+  s.es = FP_SEG(ShortFilename);	r.x.di = FP_OFF(ShortFilename);
+  r.x.cflag = CARRY;		/* Set carry to prepare for failure */
+  intdosx(&r, &r, &s);
+  if (r.x.cflag != CARRY)	/* No carry -> Ok */
     return fopen(ShortFilename, Mode);
 
   return fopen(Filename, Mode);
@@ -271,27 +281,29 @@ FILE* FileOpen(const char* Filename, const char* Mode)
 /* Warning: no final '\' and no root directories */
 bool IsADirectory(char Filename[])
 {
-  struct REGPACK r;
+  union REGS r;
+  struct SREGS s;
   lfn_find_results FindResults;
 
   errno = 0;
-  r.r_ax = 0x714E;		/* Find first matching file */
-  r.r_cx = _A_SUBDIR | _A_RDONLY;
-  r.r_si = 1;			/* MS-DOS style time */
-  r.r_ds = FP_SEG(Filename);	 r.r_dx = FP_OFF(Filename);
-  r.r_es = FP_SEG(&FindResults); r.r_di = FP_OFF(&FindResults);
-  r.r_flags = CARRY;		/* Set carry to prepare for failure */
-  intr(DOS, &r);
-  if ((r.r_flags & CARRY) == 0) /* No carry -> Ok */
+  r.x.ax = 0x714E;		/* Find first matching file */
+  r.x.cx = _A_SUBDIR | _A_RDONLY;
+  r.x.si = 1;			/* MS-DOS style time */
+  s.ds = FP_SEG(Filename);	r.x.dx = FP_OFF(Filename);
+  s.es = FP_SEG(&FindResults);	r.x.di = FP_OFF(&FindResults);
+  r.x.cflag = CARRY;		/* Set carry to prepare for failure */
+  intdosx(&r, &r, &s);
+  if (r.x.cflag != CARRY)	/* No carry -> Ok */
   {
-    r.r_bx = r.r_ax;		/* Handle */
-    r.r_ax = 0x71A1;		/* Terminate directory search */
-    intr(DOS, &r);
-    if ((r.r_flags & CARRY) != 0) errno = r.r_ax; /* DOS error code */
+    r.x.bx = r.x.ax;		/* Handle */
+    r.x.ax = 0x71A1;		/* Terminate directory search */
+    intdosx(&r, &r, &s);
+    if (r.x.cflag == CARRY)
+      errno = r.x.ax;		/* DOS error code */
     return ((FindResults.Attributes & _A_SUBDIR) != 0);
   }
 
-  if (r.r_ax == LFN_NOT_SUPPORTED) /* Function not supported */
+  if (r.x.ax == LFN_NOT_SUPPORTED) /* Function not supported */
   {
     struct ffblk SearchRec;	/* Use the standard functions */
 
@@ -301,7 +313,7 @@ bool IsADirectory(char Filename[])
   }
 
   /* A true error */
-  errno = r.r_ax;		/* DOS error code */
+  errno = r.x.ax;		/* DOS error code */
   return FALSE;
 }
 
@@ -462,16 +474,18 @@ void UpCaseInit(void)
 	    char_table far Table[/*Size*/];
 	} far* Data;
     } UpCaseBuf;
-    struct REGPACK r;
+
+    union REGS r;
+    struct SREGS s;
 
     /* Ask DOS for the current uppercase table for chars 128..255 */
-    r.r_ax = 0x6502;	     /* get upper case table */
-    r.r_bx = 0xFFFF;	     /* default codepage     */
-    r.r_dx = 0xFFFF;	     /* default country	     */
-    r.r_cx = sizeof(UpCaseBuf);
-    r.r_es = FP_SEG(&UpCaseBuf); r.r_di = FP_OFF(&UpCaseBuf);
-    intr(DOS, &r);
-    if (((r.r_flags & CARRY) == 0) &&  /* No carry -> Ok */
+    r.x.ax = 0x6502;	     /* get upper case table */
+    r.x.bx = 0xFFFF;	     /* default codepage     */
+    r.x.dx = 0xFFFF;	     /* default country	     */
+    r.x.cx = sizeof(UpCaseBuf);
+    s.es = FP_SEG(&UpCaseBuf); r.x.di = FP_OFF(&UpCaseBuf);
+    intdosx(&r, &r, &s);
+    if ((r.x.cflag != CARRY) &&  /* No carry -> Ok */
 	(UpCaseBuf.ID == 2) &&
 	(UpCaseBuf.Data->Size == UPCASE_TABLE_SIZE))
        UpCaseTable = UpCaseBuf.Data->Table;
