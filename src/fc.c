@@ -944,7 +944,7 @@ bool CompareSetOfFiles(void)
     return FALSE;
   strcpy(FirstFileName, SourceNamePattern);
 
-  Done1 = (FindFirst(FileSpecs[FIRST_FILE], &FindData1, FA_RDONLY) != 0);
+  Done1 = (FindFirst(FileSpecs[FIRST_FILE], &FindData1, _A_RDONLY) != 0);
   while (!Done1)
   {
     /* Avoid path length overflow */
@@ -963,7 +963,7 @@ bool CompareSetOfFiles(void)
 	break;
 
       case CommonSource:
-	Done2 = (FindFirst(FileSpecs[SECOND_FILE], &FindData2, FA_RDONLY) != 0);
+	Done2 = (FindFirst(FileSpecs[SECOND_FILE], &FindData2, _A_RDONLY) != 0);
 	if (Done2)
 	{
 	  if (OptFlags.ShowUnmatched)
@@ -1068,11 +1068,11 @@ bool ScanSubdirs(void)
     return FALSE;
   strcpy(FirstSubdirName, AllFiles); /* All subdirectories */
 
-  if (FindFirst(FileSpecs[FIRST_FILE], &FindData1, FA_DIREC | FA_RDONLY) != 0)
+  if (FindFirst(FileSpecs[FIRST_FILE], &FindData1, _A_SUBDIR | _A_RDONLY) != 0)
     return FALSE;
 
   do
-    if (((FindData1.Attributes & FA_DIREC) != 0) && /* Is a directory */
+    if (((FindData1.Attributes & _A_SUBDIR) != 0) && /* Is a directory */
 	(*(FindData1.Filename) != '.'))
     {
       find_data FindData2;
@@ -1087,10 +1087,10 @@ bool ScanSubdirs(void)
       /* If the same subdirectory exists in the second path */
       strcpy(SecondSubdirName, FindData1.Filename);
       FileSpecs[SECOND_FILE][sizeof(FileSpecs[SECOND_FILE]) - 1] = END_OF_STRING;
-      if (FindFirst(FileSpecs[SECOND_FILE], &FindData2, FA_DIREC | FA_RDONLY) == 0)
+      if (FindFirst(FileSpecs[SECOND_FILE], &FindData2, _A_SUBDIR | _A_RDONLY) == 0)
       {
 	FindClose(&FindData2);
-	if ((FindData2.Attributes & FA_DIREC) == 0) break; /* Not a directory */
+	if ((FindData2.Attributes & _A_SUBDIR) == 0) break; /* Not a directory */
 
 	/* Avoid path length overflow */
 	if (FirstSubdirName - FileSpecs[FIRST_FILE] +

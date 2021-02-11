@@ -276,7 +276,7 @@ bool IsADirectory(char Filename[])
 
   errno = 0;
   r.r_ax = 0x714E;		/* Find first matching file */
-  r.r_cx = FA_DIREC | FA_RDONLY;
+  r.r_cx = _A_SUBDIR | _A_RDONLY;
   r.r_si = 1;			/* MS-DOS style time */
   r.r_ds = FP_SEG(Filename);	 r.r_dx = FP_OFF(Filename);
   r.r_es = FP_SEG(&FindResults); r.r_di = FP_OFF(&FindResults);
@@ -288,16 +288,16 @@ bool IsADirectory(char Filename[])
     r.r_ax = 0x71A1;		/* Terminate directory search */
     intr(DOS, &r);
     if ((r.r_flags & CARRY) != 0) errno = r.r_ax; /* DOS error code */
-    return ((FindResults.Attributes & FA_DIREC) != 0);
+    return ((FindResults.Attributes & _A_SUBDIR) != 0);
   }
 
   if (r.r_ax == LFN_NOT_SUPPORTED) /* Function not supported */
   {
     struct ffblk SearchRec;	/* Use the standard functions */
 
-    errno = findfirst(Filename, &SearchRec, FA_DIREC | FA_RDONLY);
+    errno = findfirst(Filename, &SearchRec, _A_SUBDIR | _A_RDONLY);
     if (errno == 0)
-      return ((SearchRec.ff_attrib & FA_DIREC) != 0);
+      return ((SearchRec.ff_attrib & _A_SUBDIR) != 0);
   }
 
   /* A true error */

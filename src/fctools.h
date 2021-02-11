@@ -3,7 +3,20 @@
 			/* Auxiliary routines for FC */
 #include <stdio.h>
 #include <dos.h>
+
+#if defined(__TURBOC__)
 #include <dir.h>
+#else
+#include <io.h>                         /* for findfirst, findnext */
+/* redefine struct name */
+#define ffblk find_t
+/* rename one of the member of that struct */
+#define ff_name name
+#define ff_attrib attrib
+#define findfirst(pattern, buf, attrib) \
+  _dos_findfirst((pattern), (attrib), (struct find_t *)(buf))
+#define findnext(buf) _dos_findnext((struct find_t *)(buf))
+#endif
 
 typedef unsigned char bool;
 #define FALSE		0
