@@ -37,10 +37,8 @@ Version 3.03: Bug fix: /M was not allowed
 	      Added a switch termination check
 *************************************************************************** */
 
-#define USE_KITTEN	/* Define this to use kitten */
-
 #if !defined(__LARGE__)
-  #error Must be compiled with the LARGE model.
+# error Must be compiled with the LARGE model.
 #endif
 
 #include <stdio.h>
@@ -48,13 +46,19 @@ Version 3.03: Bug fix: /M was not allowed
 #include <string.h>
 #include <ctype.h>
 #include <io.h>
-#include <sys\stat.h>
-#ifdef USE_KITTEN
-  #include "Kitten.h"
-#endif
-#include "FCTools.h"
+#include <sys/stat.h>
+
+#include "../kitten/kitten.h"
+
+#include "fctools.h"
+
 /* ------------------------------------------------------------------------ */
+#ifdef __TURBOC__
 #define MAX_LINES			32765
+#else
+// Watcom has 32 byte overhead on malloc
+#define MAX_LINES			32750
+#endif
 #define DEFAULT_LINES_FOR_RESYNC	2
 #define DEFAULT_BINARY_MAX_DIFF		20  /* Bytes */
 
@@ -121,12 +125,9 @@ const char NoCorrespondent[] = "File %s has no correspondent (%s)";
 #define HELP		1
 #define MESSAGE		2
 #define REPORT_TEXT	3
-/* ------------------------------------------------------------------------ */
-#ifdef USE_KITTEN
-  #define Format(setnum, msgnum, message) kittengets(setnum, msgnum, message)
-#else
-  #define Format(dummy1, dummy2, message)  message
-#endif
+nl_catd cat;					/* language catalog         */
+#define Format(setnum, msgnum, message) catgets(cat, setnum, msgnum, message)
+
 /* ************************************************************************ */
 void HelpMessage(void)
 {
@@ -755,6 +756,8 @@ bool AsciiCompare(void)
       (Occurr1 == NULL) || (Occurr2 == NULL))
   {
     printf(Format(MESSAGE,8,"Insufficient memory")); NewLine;
+    printf("OCCURR_ARRAY_SIZE = %lu\n", (unsigned long)OCCURR_ARRAY_SIZE);
+    printf("HASH_ARRAY_SIZE = %lu\n", (unsigned long)HASH_ARRAY_SIZE);
     return FALSE;
   }
   memset(Hash1, 0, HASH_ARRAY_SIZE);
@@ -948,7 +951,7 @@ bool CompareSetOfFiles(void)
     return FALSE;
   strcpy(FirstFileName, SourceNamePattern);
 
-  Done1 = (FindFirst(FileSpecs[FIRST_FILE], &FindData1, FA_RDONLY) != 0);
+  Done1 = (FindFirst(FileSpecs[FIRST_FILE], &FindData1, _A_RDONLY) != 0);
   while (!Done1)
   {
     /* Avoid path length overflow */
@@ -967,7 +970,7 @@ bool CompareSetOfFiles(void)
 	break;
 
       case CommonSource:
-	Done2 = (FindFirst(FileSpecs[SECOND_FILE], &FindData2, FA_RDONLY) != 0);
+	Done2 = (FindFirst(FileSpecs[SECOND_FILE], &FindData2, _A_RDONLY) != 0);
 	if (Done2)
 	{
 	  if (OptFlags.ShowUnmatched)
@@ -1072,11 +1075,11 @@ bool ScanSubdirs(void)
     return FALSE;
   strcpy(FirstSubdirName, AllFiles); /* All subdirectories */
 
-  if (FindFirst(FileSpecs[FIRST_FILE], &FindData1, FA_DIREC | FA_RDONLY) != 0)
+  if (FindFirst(FileSpecs[FIRST_FILE], &FindData1, _A_SUBDIR | _A_RDONLY) != 0)
     return FALSE;
 
   do
-    if (((FindData1.Attributes & FA_DIREC) != 0) && /* Is a directory */
+    if (((FindData1.Attributes & _A_SUBDIR) != 0) && /* Is a directory */
 	(*(FindData1.Filename) != '.'))
     {
       find_data FindData2;
@@ -1091,10 +1094,10 @@ bool ScanSubdirs(void)
       /* If the same subdirectory exists in the second path */
       strcpy(SecondSubdirName, FindData1.Filename);
       FileSpecs[SECOND_FILE][sizeof(FileSpecs[SECOND_FILE]) - 1] = END_OF_STRING;
-      if (FindFirst(FileSpecs[SECOND_FILE], &FindData2, FA_DIREC | FA_RDONLY) == 0)
+      if (FindFirst(FileSpecs[SECOND_FILE], &FindData2, _A_SUBDIR | _A_RDONLY) == 0)
       {
 	FindClose(&FindData2);
-	if ((FindData2.Attributes & FA_DIREC) == 0) break; /* Not a directory */
+	if ((FindData2.Attributes & _A_SUBDIR) == 0) break; /* Not a directory */
 
 	/* Avoid path length overflow */
 	if (FirstSubdirName - FileSpecs[FIRST_FILE] +
@@ -1125,16 +1128,13 @@ void OnExit(void)
 {
   /* If created destroy the CRC speed-up table */
   if (CRCTable != NULL) free(CRCTable);
-#ifdef USE_KITTEN
-  kittenclose();	/* Close the NLS catalog */
-#endif
+
+  catclose(cat);	/* Close the NLS catalog */
 }
 /* ------------------------------------------------------------------------ */
 int main(void)
 {
-#ifdef USE_KITTEN
-  kittenopen("FC");     /* Try opening NLS catalog */
-#endif
+  cat = catopen("fc", 0);	/* Try opening NLS catalog */
   atexit (OnExit);	/* Install the clean-up procedure */
   UpCaseInit();		/* Initialize the table for uppercase conversion */
 
