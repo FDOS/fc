@@ -53,7 +53,12 @@ Version 3.03: Bug fix: /M was not allowed
 #include "fctools.h"
 
 /* ------------------------------------------------------------------------ */
+#ifdef __TURBOC__
 #define MAX_LINES			32765
+#else
+// Watcom has 32 byte overhead on malloc
+#define MAX_LINES			32750
+#endif
 #define DEFAULT_LINES_FOR_RESYNC	2
 #define DEFAULT_BINARY_MAX_DIFF		20  /* Bytes */
 
@@ -751,6 +756,8 @@ bool AsciiCompare(void)
       (Occurr1 == NULL) || (Occurr2 == NULL))
   {
     printf(Format(MESSAGE,8,"Insufficient memory")); NewLine;
+    printf("OCCURR_ARRAY_SIZE = %lu\n", (unsigned long)OCCURR_ARRAY_SIZE);
+    printf("HASH_ARRAY_SIZE = %lu\n", (unsigned long)HASH_ARRAY_SIZE);
     return FALSE;
   }
   memset(Hash1, 0, HASH_ARRAY_SIZE);
