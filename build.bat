@@ -15,7 +15,6 @@ set INCLUDE=C:\watcom\h
 set CC=wcl
 set EXEFLAGS=-ml
 set CFLAGS=-bt=DOS -bcl=DOS -D__MSDOS__ -oas -zp1 -s -0 -wx -we -zq -fm %EXEFLAGS% -fe=
-set TARGET=fc.exe
 goto doit
 
 :tcc
@@ -31,14 +30,28 @@ set EXEFLAGS=-ml -N -Z -O -k-
 set CFLAGS=-w -M -f- -a- -K -ln %EXEFLAGS% -e
 rem tcc looks for includes from the current directory, not the location of the
 rem file that's trying to include them, so add kitten's location
-set CFLAGS=-I../kitten %CFLAGS%
-set TARGET=fc.exe
+set CFLAGS=-I../kitten -I../tnyprntf %CFLAGS%
 goto doit
 
 :doit
-rem # if you want to build without kitten uncomment the following
-rem set CFLAGS=-DNOCATS %CFLAGS%
-rem set TARGET=_%TARGET%
+set EXTRA_OBJS=
 
-rem We use GNU make for all targets
-make -C src %TARGET%
+set EXTRA_OBJS=%EXTRA_OBJS% tnyprntf.obj
+rem # if you want to build without tnyprntf comment the above and uncomment
+rem the following
+rem set CFLAGS=-DNOPRNTF %CFLAGS%
+
+set EXTRA_OBJS=%EXTRA_OBJS% kitten.obj
+rem # if you want to build without kitten comment the above and uncomment
+rem the following
+rem set CFLAGS=-DNOCATS %CFLAGS%
+
+set UPXARGS=upx --8086 --best
+rem if you don't want to use UPX set
+rem     UPXARGS=-rem
+rem if you use UPX: then options are
+rem     --8086 for 8086 compatibility
+rem   or
+rem     --best for smallest
+
+make -C src

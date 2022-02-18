@@ -1,27 +1,21 @@
-# Minimal Makefile for FC
 
 all: fc.exe
 
-UPX=upx --8086
-# if you don't want to use UPX set
-#     UPX=-rem (DOS)
-#   or
-#     UPX=true (Unix)
-# if you use UPX: then options are
-#     --8086 for 8086 compatibility
-#   or
-#     --best for smallest
+# Watcom has different flag for output file name at compile vs link
+_CFLAGS = $(subst -fe=,-fo=,$(CFLAGS))
 
-fc.exe: fc.c fctools.c ../kitten/kitten.c
-	$(CC) $(CFLAGS)$@ $^ $(LDFLAGS)
-	$(UPX) $@
+kitten.obj: ../kitten/kitten.c
+	$(CC) $(_CFLAGS)$@ -c $^
 
-_fc.exe: fc.c fctools.c
+tnyprntf.obj: ../tnyprntf/tnyprntf.c
+	$(CC) $(_CFLAGS)$@ -c $^
+
+fc.exe: fc.c fctools.c $(EXTRA_OBJS)
 	$(CC) $(CFLAGS)$@ $^ $(LDFLAGS)
-	$(UPX) $@
+	$(UPXARGS) $@
 
 clean:
 	$(RM) fc.exe
-	$(RM) _fc.exe
 	$(RM) *.o
 	$(RM) *.obj
+	$(RM) *.map
