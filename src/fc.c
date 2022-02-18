@@ -41,7 +41,6 @@ Version 3.03: Bug fix: /M was not allowed
 # error Must be compiled with the LARGE model.
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -49,6 +48,7 @@ Version 3.03: Bug fix: /M was not allowed
 #include <sys/stat.h>
 
 #include "../kitten/kitten.h"
+#include "../tnyprntf/tnyprntf.h"
 
 #include "fctools.h"
 
@@ -132,26 +132,26 @@ nl_catd cat;					/* language catalog         */
 void HelpMessage(void)
 {
   puts("FreeDOS FC version 3.03");
-  printf(Format(HELP, 0,"Compares two files or sets of files and displays the differences between them")); NewLine;
+  PRINTF(Format(HELP, 0,"Compares two files or sets of files and displays the differences between them")); NewLine;
   NewLine;
-  printf(Format(HELP, 1,"FC [switches] [drive1:][path1]filename1 [drive2][path2]filename2 [switches]")); NewLine;
-  printf(Format(HELP, 2," /A    Display only first and last lines for each set of differences")); NewLine;
-  printf(Format(HELP, 3," /B    Perform a binary comparison")); NewLine;
-  printf(Format(HELP, 4," /C    Disregard the case of letters")); NewLine;
-  printf(Format(HELP, 5," /L    Compare files as ASCII text")); NewLine;
-  printf(Format(HELP,13," /LBn  Set the maximum number of consecutive different ASCII lines to n")); NewLine;
-  printf(Format(HELP, 6," /Mn   Set the maximum differences in binary comparison to n bytes")); NewLine;
-  printf(Format(HELP, 7,"       (default = %d, 0 = unlimited, /M = /M0)"),DEFAULT_BINARY_MAX_DIFF); NewLine;
-  printf(Format(HELP, 8," /N    Display the line numbers on a text comparison")); NewLine;
-  printf(Format(HELP,17," /Q    Don't show the list of differences")); NewLine;
-  printf(Format(HELP,16," /R    Show a brief final report (always active when using /S)")); NewLine;
-  printf(Format(HELP, 9," /S    Extend the scan to the files in subdirectories")); NewLine;
-  printf(Format(HELP,10," /T    Do not expand tabs to spaces")); NewLine;
-  printf(Format(HELP,18," /U    Show the filenames of the files without a correspondent")); NewLine;
-  printf(Format(HELP,11," /W    Pack white space (tabs and spaces) for text comparison")); NewLine;
-  printf(Format(HELP,12," /X    Do not show context lines in text comparison")); NewLine;
-  printf(Format(HELP,14," /nnn  Set the minimum number of consecutive matching lines to nnn")); NewLine;
-  printf(Format(HELP,15,"       for comparison resynchronization")); NewLine;
+  PRINTF(Format(HELP, 1,"FC [switches] [drive1:][path1]filename1 [drive2][path2]filename2 [switches]")); NewLine;
+  PRINTF(Format(HELP, 2," /A    Display only first and last lines for each set of differences")); NewLine;
+  PRINTF(Format(HELP, 3," /B    Perform a binary comparison")); NewLine;
+  PRINTF(Format(HELP, 4," /C    Disregard the case of letters")); NewLine;
+  PRINTF(Format(HELP, 5," /L    Compare files as ASCII text")); NewLine;
+  PRINTF(Format(HELP,13," /LBn  Set the maximum number of consecutive different ASCII lines to n")); NewLine;
+  PRINTF(Format(HELP, 6," /Mn   Set the maximum differences in binary comparison to n bytes")); NewLine;
+  PRINTF(Format(HELP, 7,"       (default = %d, 0 = unlimited, /M = /M0)"),DEFAULT_BINARY_MAX_DIFF); NewLine;
+  PRINTF(Format(HELP, 8," /N    Display the line numbers on a text comparison")); NewLine;
+  PRINTF(Format(HELP,17," /Q    Don't show the list of differences")); NewLine;
+  PRINTF(Format(HELP,16," /R    Show a brief final report (always active when using /S)")); NewLine;
+  PRINTF(Format(HELP, 9," /S    Extend the scan to the files in subdirectories")); NewLine;
+  PRINTF(Format(HELP,10," /T    Do not expand tabs to spaces")); NewLine;
+  PRINTF(Format(HELP,18," /U    Show the filenames of the files without a correspondent")); NewLine;
+  PRINTF(Format(HELP,11," /W    Pack white space (tabs and spaces) for text comparison")); NewLine;
+  PRINTF(Format(HELP,12," /X    Do not show context lines in text comparison")); NewLine;
+  PRINTF(Format(HELP,14," /nnn  Set the minimum number of consecutive matching lines to nnn")); NewLine;
+  PRINTF(Format(HELP,15,"       for comparison resynchronization")); NewLine;
 }
 /* ************************************************************************ */
 /* Scan arguments for switches and files */
@@ -214,7 +214,7 @@ bool ScanArguments(void)
 		MaxASCIIDiffLines = atoi(&Arguments[3]);
 	      if (MaxASCIIDiffLines == 0)
 	      {
-		printf(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
+		PRINTF(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
 		return FALSE;
 	      }
 	      Arguments += i;
@@ -268,7 +268,7 @@ bool ScanArguments(void)
 	      MaxBinDifferences = atoi(&Arguments[2]);
 	    else
 	    {
-	      printf(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
+	      PRINTF(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
 	      return FALSE;
 	    }
 	    Arguments += i;
@@ -298,7 +298,7 @@ bool ScanArguments(void)
 	      LinesForResync = atoi(&Arguments[2]);
 	    else
 	    {
-	      printf(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
+	      PRINTF(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
 	      return FALSE;
 	    }
 	    Arguments += i;
@@ -308,7 +308,7 @@ bool ScanArguments(void)
 
 	  default:
 	    Arguments[2] = END_OF_STRING;
-	    printf(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
+	    PRINTF(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
 	    return FALSE;
 	}
 	/* Check for a correct switch termination */
@@ -321,7 +321,7 @@ bool ScanArguments(void)
 	  case '-':
 	    break;
 	  default:
-	    printf(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
+	    PRINTF(Format(MESSAGE,0,(char*)InvalidSwitch), Arguments); NewLine;
 	    return FALSE;
 	}
 	break;
@@ -333,7 +333,7 @@ bool ScanArguments(void)
 	{
 	  if (Arguments[i] == END_OF_STRING)
 	  {
-	    printf(Format(MESSAGE,2,(char*)InvalidFilename)); NewLine;
+	    PRINTF(Format(MESSAGE,2,(char*)InvalidFilename)); NewLine;
 	    return FALSE;
 	  }
 	  i++;
@@ -342,14 +342,14 @@ bool ScanArguments(void)
 
 	if (FileCounter >= FILE_SPECS)
 	{
-	  printf(Format(MESSAGE,1,(char*)TooManyFiles)); NewLine;
+	  PRINTF(Format(MESSAGE,1,(char*)TooManyFiles)); NewLine;
 	  return FALSE;
 	}
 
 	if (FullPath(FileSpecs[FileCounter], Arguments,
 		     sizeof(FileSpecs[0])) == NULL)
 	{
-	  printf(Format(MESSAGE,2,(char*)InvalidFilename)); NewLine;
+	  PRINTF(Format(MESSAGE,2,(char*)InvalidFilename)); NewLine;
 	  return FALSE;
 	}
 	Arguments += i + 1;
@@ -359,7 +359,7 @@ bool ScanArguments(void)
       default:	/* Must be a filename */
 	if (FileCounter >= FILE_SPECS)
 	{
-	  printf(Format(MESSAGE,1,(char*)TooManyFiles)); NewLine;
+	  PRINTF(Format(MESSAGE,1,(char*)TooManyFiles)); NewLine;
 	  return FALSE;
 	}
 	i = 0;
@@ -371,7 +371,7 @@ bool ScanArguments(void)
 	if (FullPath(FileSpecs[FileCounter], Arguments,
 		     sizeof(FileSpecs[0])) == NULL)
 	{
-	  printf(Format(MESSAGE,2,(char*)InvalidFilename)); NewLine;
+	  PRINTF(Format(MESSAGE,2,(char*)InvalidFilename)); NewLine;
 	  return FALSE;
 	}
 	Arguments += i;
@@ -382,7 +382,7 @@ bool ScanArguments(void)
   switch (FileCounter)
   {
     case 0:
-      printf(Format(MESSAGE,3,"No file specified")); NewLine;
+      PRINTF(Format(MESSAGE,3,"No file specified")); NewLine;
       return FALSE;
 
     case 1:		/* Default: the current directory */
@@ -400,7 +400,7 @@ bool ScanArguments(void)
       if (!HasWildcards(FileSpecs[i]) &&
 	  IsADirectory(FileSpecs[i]))	     /* Directory */
 					     /* Assume "All files" */
-	sprintf(&FileSpecs[i][LastChar + 1], "\\%s", AllFiles);
+	SPRINTF(&FileSpecs[i][LastChar + 1], "\\%s", AllFiles);
    /* else regular file (possibly with wildcards) */
   }
 
@@ -440,11 +440,11 @@ bool BinaryCompare(void)
   {
     if (OptFlags.Quiet)
     {
-      printf(Format(MESSAGE,13,"The files are of different size")); NewLine;
+      PRINTF(Format(MESSAGE,13,"The files are of different size")); NewLine;
       NewLine;
       return FALSE;
     }
-    printf(Format(MESSAGE,4,"Warning: the files are of different size!")); NewLine;
+    PRINTF(Format(MESSAGE,4,"Warning: the files are of different size!")); NewLine;
     if (FileSize1 < FileSize2) FileSize1 = FileSize2;
   }
   for (Offset = 0; Offset < FileSize1; Offset++)
@@ -454,25 +454,25 @@ bool BinaryCompare(void)
     {
       if (OptFlags.Quiet)
       {
-	printf(Format(MESSAGE,14,(char*)Differ)); NewLine;
+	PRINTF(Format(MESSAGE,14,(char*)Differ)); NewLine;
 	NewLine;
 	return FALSE;
       }
       Differences++;
       if ((MaxBinDifferences > 0) && (Differences > MaxBinDifferences))
       {
-	printf(Format(MESSAGE,5,"Comparison stopped after %d mismatches"),
+	PRINTF(Format(MESSAGE,5,"Comparison stopped after %d mismatches"),
 	       MaxBinDifferences); NewLine;
 	NewLine;
 	return FALSE;
       }
-      printf("%08lX:     %02X  %c      %02X  %c\n", Offset,
+      PRINTF("%08lX:     %02X  %c      %02X  %c\n", Offset,
 	     a, (iscntrl(a) ? ' ' : a), b, (iscntrl(b) ? ' ' : b));
     }
   }
   if (Differences == 0)
   {
-    printf(Format(MESSAGE,6,(char*)NoDifferences)); NewLine;
+    PRINTF(Format(MESSAGE,6,(char*)NoDifferences)); NewLine;
     NewLine;
     return TRUE;
   }
@@ -496,7 +496,7 @@ void OutputLine(FILE* File, line_counter LineNumber)
   unsigned long LineLength = 0;
   int c;
 
-  if (OptFlags.LineNumber) printf("%5u: ", LineNumber);
+  if (OptFlags.LineNumber) PRINTF("%5u: ", LineNumber);
 
   while (TRUE)
   {
@@ -678,7 +678,7 @@ line_counter HashFile(FILE* file, hashing_values HashVect[],
 
   if (LineCounter >= MAX_LINES)
   {
-    printf(Format(MESSAGE,7,"Warning: comparison interrupted after %d lines"),
+    PRINTF(Format(MESSAGE,7,"Warning: comparison interrupted after %d lines"),
 	   LineCounter); NewLine;
   }
   return LineCounter;
@@ -703,7 +703,7 @@ void ShowBlockOfDiff(line_counter Start, line_counter Finish,
      we are finished */
   if ((Finish < Start) && (ContextLines <= NO_CONTEXT)) return;
 
-  printf(AsciiDiffStart, FileName);
+  PRINTF(AsciiDiffStart, FileName);
 		    /* Show the starting context if needed */
   while (LineCounter < Start)
   {
@@ -712,7 +712,7 @@ void ShowBlockOfDiff(line_counter Start, line_counter Finish,
 		    /* Show the differing lines */
   if (OptFlags.Brief)
   {
-    printf(Omissis);
+    PRINTF(Omissis);
     while (LineCounter < Finish)
     {
       LineCounter++; SkipLine(File);
@@ -755,9 +755,9 @@ bool AsciiCompare(void)
       (Hash1 == NULL) || (Hash2 == NULL) ||
       (Occurr1 == NULL) || (Occurr2 == NULL))
   {
-    printf(Format(MESSAGE,8,"Insufficient memory")); NewLine;
-    printf("OCCURR_ARRAY_SIZE = %lu\n", (unsigned long)OCCURR_ARRAY_SIZE);
-    printf("HASH_ARRAY_SIZE = %lu\n", (unsigned long)HASH_ARRAY_SIZE);
+    PRINTF(Format(MESSAGE,8,"Insufficient memory")); NewLine;
+    PRINTF("OCCURR_ARRAY_SIZE = %lu\n", (unsigned long)OCCURR_ARRAY_SIZE);
+    PRINTF("HASH_ARRAY_SIZE = %lu\n", (unsigned long)HASH_ARRAY_SIZE);
     return FALSE;
   }
   memset(Hash1, 0, HASH_ARRAY_SIZE);
@@ -873,7 +873,7 @@ bool AsciiCompare(void)
 
     if (OptFlags.Quiet)
     {
-      printf(Format(MESSAGE,14,(char*)Differ)); NewLine;
+      PRINTF(Format(MESSAGE,14,(char*)Differ)); NewLine;
       NewLine;
       Different = TRUE;
       break;
@@ -893,7 +893,7 @@ bool AsciiCompare(void)
 	i++; ResyncLine++;
 	if (i > MaxASCIIDiffLines)
 	{
-	  printf(Format(MESSAGE,12,"Resync failed: files too different")); NewLine;
+	  PRINTF(Format(MESSAGE,12,"Resync failed: files too different")); NewLine;
 	  NewLine;
 	  Different = TRUE;
 	  break;
@@ -920,14 +920,14 @@ bool AsciiCompare(void)
 		    File2, FileSpecs[SECOND_FILE],
 		    &LinesRead2, LinesInFile2);
     Line2 = ResyncLine;
-    printf(AsciiDiffEnd);
+    PRINTF(AsciiDiffEnd);
     Different = TRUE;
   }
   free (Hash1);
 
   if (!Different)
   {
-    printf(Format(MESSAGE,6,(char*)NoDifferences)); NewLine;
+    PRINTF(Format(MESSAGE,6,(char*)NoDifferences)); NewLine;
     NewLine;
     return TRUE;
   }
@@ -975,7 +975,7 @@ bool CompareSetOfFiles(void)
 	{
 	  if (OptFlags.ShowUnmatched)
 	  {
-	    printf(Format(MESSAGE,15,(char*)NoCorrespondent),
+	    PRINTF(Format(MESSAGE,15,(char*)NoCorrespondent),
 		   FileSpecs[FIRST_FILE], FileSpecs[SECOND_FILE]); NewLine;
 	    NewLine;
 	  }
@@ -998,7 +998,7 @@ bool CompareSetOfFiles(void)
       {
 	if (OptFlags.ShowUnmatched)
 	{
-	  printf(Format(MESSAGE,15,(char*)NoCorrespondent),
+	  PRINTF(Format(MESSAGE,15,(char*)NoCorrespondent),
 		 FileSpecs[FIRST_FILE], FileSpecs[SECOND_FILE]); NewLine;
 	  NewLine;
 	}
@@ -1010,14 +1010,14 @@ bool CompareSetOfFiles(void)
 	if (File1 == NULL)
 	{
 	  fcloseall();
-	  printf(Format(MESSAGE,9,"Error opening file %s"),
+	  PRINTF(Format(MESSAGE,9,"Error opening file %s"),
 		 FileSpecs[FIRST_FILE]); NewLine;
 	  FindClose(&FindData1);
 	  if (NameMatching == CommonSource) FindClose(&FindData2);
 	  return FALSE;
 	}
 	FileCount++;
-	printf(Format(MESSAGE,10,"Comparing %s and %s"),
+	PRINTF(Format(MESSAGE,10,"Comparing %s and %s"),
 	       FileSpecs[FIRST_FILE], FileSpecs[SECOND_FILE]); NewLine;
 	switch (CompareMode)
 	{
@@ -1150,15 +1150,15 @@ int main(void)
 
   if (OptFlags.Report)
   {
-    printf(Format(REPORT_TEXT,0,"Compared %d files"),FileCount);
+    PRINTF(Format(REPORT_TEXT,0,"Compared %d files"),FileCount);
     if (OptFlags.ScanSubdirs)
-      printf(Format(REPORT_TEXT,1," in %d directories"),DirectoryCount);
+      PRINTF(Format(REPORT_TEXT,1," in %d directories"),DirectoryCount);
     NewLine;
-    printf(Format(REPORT_TEXT,2,"%d files match, %d files are different"),
+    PRINTF(Format(REPORT_TEXT,2,"%d files match, %d files are different"),
 	   FileCount - FilesDifferent, FilesDifferent); NewLine;
     if ((NameMatching == MatchingNames) || (UnmatchedCount > 0))
     {
-      printf(Format(REPORT_TEXT,3,"%d files have no correspondent"),
+      PRINTF(Format(REPORT_TEXT,3,"%d files have no correspondent"),
 	     UnmatchedCount);
       NewLine;
     }
@@ -1166,7 +1166,7 @@ int main(void)
 
   if ((FileCount == 0) && !OptFlags.Report)
   {
-    printf(Format(MESSAGE,11,"No such file or directory")); NewLine;
+    PRINTF(Format(MESSAGE,11,"No such file or directory")); NewLine;
     return EL_NO_FILE_ERROR;
   }
 
