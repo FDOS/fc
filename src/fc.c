@@ -37,8 +37,8 @@ Version 3.03: Bug fix: /M was not allowed
 	      Added a switch termination check
 *************************************************************************** */
 
-#if !defined(__LARGE__)
-# error Must be compiled with the LARGE model.
+#if !defined(__COMPACT__) && !defined(__LARGE__)
+# error Must be compiled with the COMPACT or LARGE model.
 #endif
 
 #include <stdlib.h>

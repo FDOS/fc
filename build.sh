@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ x"${COMPILER}" = "xgcc" ] ; then
-  echo Apparently fc requires large model, which gcc doesn\'t have
+  echo Requires compact or large model, which gcc doesn\'t have
   exit 1
 
 elif [ x"${COMPILER}" = "xwatcom" ] ; then
@@ -13,7 +13,7 @@ elif [ x"${COMPILER}" = "xwatcom" ] ; then
   export PATH=${PATH}:${WATCOM}/binl64
   export INCLUDE=${WATCOM}/h
   export CC="wcl"
-  export CFLAGS="-q -bt=DOS -bcl=DOS -D__MSDOS__ -zp1 -ml -lr -fe="
+  export CFLAGS="-q -bt=DOS -bcl=DOS -D__MSDOS__ -zp1 -mc -lr -fe="
   export LDFLAGS=""
 
 elif [ x"${COMPILER}" = "xwatcom-emu" ] ; then

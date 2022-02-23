@@ -13,7 +13,7 @@ rem # -m{t,s,m,c,l,h}  memory model
 set WATCOM=C:\watcom
 set INCLUDE=C:\watcom\h
 set CC=wcl
-set EXEFLAGS=-ml
+set EXEFLAGS=-mc
 set CFLAGS=-bt=DOS -bcl=DOS -D__MSDOS__ -oas -zp1 -s -0 -wx -we -zq -fm %EXEFLAGS% -fe=
 goto doit
 
@@ -26,7 +26,7 @@ rem # -exxx executable name (must be last)
 rem # -N stack checking -a- byte alignment  -ln no default libs
 
 set CC=tcc
-set EXEFLAGS=-ml -N -Z -O -k-
+set EXEFLAGS=-mc -N -Z -O -k-
 set CFLAGS=-w -M -f- -a- -K -ln %EXEFLAGS% -e
 rem tcc looks for includes from the current directory, not the location of the
 rem file that's trying to include them, so add kitten's location
